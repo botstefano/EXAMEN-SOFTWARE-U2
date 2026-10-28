@@ -1,0 +1,20 @@
+from fastapi import APIRouter
+from app.api.v1.endpoints import auth, dashboard, detections, incidents, indicators, ops, rules, users
+
+api = APIRouter()
+api.include_router(auth.router, prefix="/auth", tags=["auth"])
+api.include_router(users.users_router, prefix="/users", tags=["users"])
+api.include_router(users.roles_router, prefix="/roles", tags=["roles"])
+api.include_router(ops.audit_router, prefix="/audit", tags=["audit"])
+api.include_router(dashboard.router, prefix="/dashboard", tags=["dashboard"])
+api.include_router(detections.router, prefix="/detections", tags=["detections"])
+api.include_router(incidents.router, prefix="/incidents", tags=["incidents"])
+api.include_router(indicators.router, prefix="/indicators", tags=["indicators"])
+api.include_router(indicators.ti_router, prefix="/threat-intel", tags=["threat-intel"])
+api.include_router(rules.router, prefix="/rules", tags=["rules"])
+api.include_router(ops.etl_router, prefix="/etl", tags=["etl"])
+api.include_router(ops.reports_router, prefix="/reports", tags=["reports"])
+api.include_router(ops.rag_router, prefix="/rag", tags=["rag"])
+api.include_router(ops.camp_router, prefix="/campaigns", tags=["campaigns"])
+api.include_router(ops.hunt_router, prefix="/threat-hunting", tags=["threat-hunting"])
+api.include_router(ops.comp_router, prefix="/compliance", tags=["compliance"])

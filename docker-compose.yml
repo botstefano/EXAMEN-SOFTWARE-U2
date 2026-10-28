@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: phishguard
+      POSTGRES_USER: phishguard
+      POSTGRES_PASSWORD: phishguard
+    volumes: [pgdata:/var/lib/postgresql/data]
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U phishguard -d phishguard"]
+      interval: 5s
+      retries: 15
+  backend:
+    build: ./backend
+    env_file: [.env]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://phishguard:phishguard@db:5432/phishguard
+      CORS_ORIGINS: http://localhost:5173
+    depends_on:
+      db: { condition: service_healthy }
+    ports: ["8000:8000"]
+  frontend:
+    build: ./frontend
+    environment:
+      VITE_PROXY_TARGET: http://backend:8000
+    depends_on: [backend]
+    ports: ["5173:5173"]
+volumes:
+  pgdata:
