@@ -1,34 +1,35 @@
-# PhishGuard Bank — Plataforma antifishing
+# PhishGuard Bank — Plataforma Antifishing SOC
 
-Backend FastAPI + PostgreSQL, frontend React/Vite/Tailwind. Todo corre con Docker Compose.
+Plataforma bancaria de detección, respuesta a incidentes y análisis antifraude/phishing reescrita en React con Vite, Tailwind CSS, TanStack Query y Zustand.
 
-## Arranque rápido (Docker)
+## Características Principales
+
+- **Dashboard SOC en Tiempo Real**: Métricas de phishing 30d, falsos positivos, MTTR, SLAs vencidos, gráficos de tendencias y canales de ataque.
+- **Motor Heurístico de Detección**: Análisis de URLs, texto y HTML calculando entropía de Shannon, distancia de Levenshtein contra marcas bancarias (PayPal, BBVA, Santander, CaixaBank, Bankinter, Visa, etc.), detección de TLDs maliciosos, homographs punycode y campos de credenciales.
+- **Gestión Integral de Incidentes**: Ciclo de vida con máquina de estados (`nuevo` → `triage` → `investigacion` → `contencion` → `cerrado` / `falso_positivo`), cálculo y alertas de SLA según severidad, y timeline de eventos.
+- **Indicadores de Compromiso (IOCs)**: Búsqueda difusa (fuzzy search) y enriquecimiento con Threat Intelligence.
+- **Control de Reglas**: Gestión de listas negras (Blacklist) y listas blancas (Whitelist) con verificador en tiempo real.
+- **Threat Hunting**: Búsqueda avanzada por filtros y correlación cruzada de IOCs con detecciones e incidentes.
+- **Asistente SOC (RAG)**: Consulta interactiva sobre playbooks operativos, políticas de retención y análisis de homograph attacks con citas de fuentes documentales.
+- **Campañas de Phishing Simulado**: Creación de plantillas, importación de objetivos, lanzamiento y cálculo de click rate y report rate.
+- **Pipelines ETL**: Ingesta de fuentes de telemetría con versionado y cálculo de checksums SHA-256.
+- **Generación de Reportes**: Exportación de reportes de KPIs, detalle de incidente y gestión mensual en PDF, Word (.docx) y Excel (.xlsx).
+- **Cumplimiento Regulatorio y Auditoría**: Monitoreo de controles de seguridad, tasa de cumplimiento de SLA y exportación de bitácora en JSON.
+- **Gestión de Usuarios y RBAC**: Control de acceso basado en roles (`admin`, `analista_soc`, `auditor`, `reportes`, `readonly`), cambio de credenciales y autenticación multifactor (TOTP MFA).
+
+## Usuarios de Demostración
+- **Elena Navarro (Admin)**: `admin@phishguard.bank`
+- **María López (Analista SOC)**: `maria.lopez@phishguard.bank`
+- **Carlos Ruiz (Analista SOC)**: `carlos.ruiz@phishguard.bank`
+- **Ana Torres (Auditor)**: `ana.torres@phishguard.bank`
+- **Javier Méndez (Reportes)**: `javier.mendez@phishguard.bank`
+- **Consulta Externa (Readonly)**: `audit.viewer@phishguard.bank`
+
+Contraseña por defecto: `DemoPassw0rd!2026`
+
+## Ejecución y Construcción
 ```bash
-cp .env.example .env
-docker compose up --build
+npm install
+npm run dev # Servidor en http://0.0.0.0:3000
+npm run build # Compilación de producción
 ```
-- Frontend: http://localhost:5173
-- API / Swagger: http://localhost:8000/docs
-- Login demo: `admin@phishguard.bank` / `DemoPassw0rd!2026`
-  (también `maria.lopez@`, `carlos.ruiz@`, `ana.torres@`, `javier.mendez@`, `audit.viewer@phishguard.bank`, misma clave)
-
-Al primer arranque el backend crea las tablas y carga datos semilla (AUTO_SEED=true).
-Para reiniciar de cero: `docker compose down -v`.
-
-## Arranque sin Docker
-Requisitos: Python 3.11+, Node 20+, PostgreSQL 14+ (con extensión pg_trgm).
-```bash
-createdb phishguard
-cd backend && python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-export DATABASE_URL=postgresql+asyncpg://USER:PASS@localhost:5432/phishguard
-uvicorn app.main:app --reload --port 8000
-# otra terminal
-cd frontend && npm install && npm run dev
-```
-
-## Notas
-- Escaneo de URL: heurísticas + listas de reglas + IOCs + análisis de texto/HTML. DNS/WHOIS reales: `ENABLE_NETWORK_CHECKS=true`.
-- LLM opcional: `LLM_PROVIDER=ollama` (y `OLLAMA_URL`). Sin LLM el asistente SOC responde con los fragmentos más relevantes.
-- ETL: fuente `sample` funciona offline; `phishtank`/`openphish` requieren internet.
-- Tests: `cd backend && pytest`.

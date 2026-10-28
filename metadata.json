@@ -1,0 +1,6 @@
+{
+  "name": "PhishGuard Bank",
+  "description": "Plataforma bancaria de detección, respuesta a incidentes y análisis antifraude / phishing",
+  "permissions": [],
+  "capabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
